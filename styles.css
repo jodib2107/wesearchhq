@@ -387,3 +387,94 @@ section#faqs.faq-section .faq-inner details.faq-row summary {
   font-size: 24px !important;
   font-weight: 700 !important;
 }
+
+/* Space between website pages */
+.website {
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+}
+
+/* Legal footer preview */
+.legal-footer {
+    margin-top: 120px;
+    background: #1E2C55;
+    padding: 45px 20px;
+    text-align: center;
+}
+
+.legal-footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.legal-title {
+    color: #E1CBA8;
+    font-family: "Montserrat ExtraBold", "Montserrat", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 22px;
+}
+
+.legal-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px 35px;
+    color: #E1CBA8;
+    font-family: "Montserrat", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.legal-links a,
+.legal-links a:visited {
+    color: #E1CBA8 !important;
+    text-decoration: none;
+font-family: "Aptos", Arial, sans-serif !important;
+    font-weight: 400 !important;
+}
+
+.legal-links a:hover {
+    color: #FDF8F2 !important;
+    font-weight: 400 !important;
+    text-decoration: underline;
+}
+
+#how-it-works img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+#research-process {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+#research-process img {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.copyright {
+  color: #E1CBA8;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  text-align: center;
+  margin-top: 22px;
+}
