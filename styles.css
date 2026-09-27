@@ -1,324 +1,1135 @@
+/* ============================================================
+   WeSearch — Design System
+   Tokens are DERIVED from the validated PowerPoint design model
+   (design-model.json / design-tokens.json), not eyeballed.
+   Typography mapping (PowerPoint -> Web):
+       Montserrat -> Montserrat   (self-hosted OFL, exact)
+       Aptos      -> Carlito      (approved OFL substitute, benchmarked)
+   Fonts are self-hosted; the site never depends on OS-installed fonts.
+   See docs/PPTX_FIDELITY.md and docs/RESPONSIVE_RECONCILIATION.md.
+   ============================================================ */
+
+/* ---- Self-hosted fonts (fonts/, OFL-1.1) ---- */
+@font-face { font-family:"Montserrat"; font-weight:600; font-style:normal;
+  font-display:swap; src:url("fonts/Montserrat-SemiBold.woff2") format("woff2"); }
+@font-face { font-family:"Montserrat"; font-weight:700; font-style:normal;
+  font-display:swap; src:url("fonts/Montserrat-Bold.woff2") format("woff2"); }
+@font-face { font-family:"Montserrat"; font-weight:800; font-style:normal;
+  font-display:swap; src:url("fonts/Montserrat-ExtraBold.woff2") format("woff2"); }
+@font-face { font-family:"Carlito"; font-weight:400; font-style:normal;
+  font-display:swap; src:url("fonts/Carlito-Regular.woff2") format("woff2"); }
+@font-face { font-family:"Carlito"; font-weight:700; font-style:normal;
+  font-display:swap; src:url("fonts/Carlito-Bold.woff2") format("woff2"); }
+@font-face { font-family:"Carlito"; font-weight:400; font-style:italic;
+  font-display:swap; src:url("fonts/Carlito-Italic.woff2") format("woff2"); }
+@font-face { font-family:"Carlito"; font-weight:700; font-style:italic;
+  font-display:swap; src:url("fonts/Carlito-BoldItalic.woff2") format("woff2"); }
+
+:root {
+  /* Colours — KNOWN (deck srgbClr fills/lines/text) */
+  --navy: #1E2C55;
+  --gold: #E1CBA8;
+  --gold-dark: #C7A36F;
+  --cream: #FDF8F2;
+  --off-white: #FFFCF8;
+  --cream-dark: #F3E9DA;        /* RESPONSIVE-DERIVED tint for hovers/alt fills */
+  --divider: #C8C8C8;
+  --ink: #2A2A2A;
+
+  /* Fonts — KNOWN mapping, self-hosted */
+  --font-display: "Montserrat", system-ui, Helvetica, Arial, sans-serif;
+  --font-body: "Carlito", system-ui, Helvetica, Arial, sans-serif;
+
+  /* Reference geometry — DERIVED from the 1280px canvas / content band.
+     content-width = validated band (~1212px); --edge = min side gap on small
+     screens. Container = min(100% - 2*edge, content-width), centred. */
+  --canvas-w: 1280px;
+  --content-width: 1212px;
+  --edge: 1.5rem;
+  /* Oracle content band sits ~10px right of a centred container at 1280 (band
+     centre 650 vs canvas 640) — a DESIGN FACT at the reference viewport. Applied
+     as a responsive shift that reaches +10px at >=1280 and relaxes to 0 (symmetric
+     gutters) by <=1024 = RESPONSIVE-DERIVED. */
+  --band-shift: clamp(0px, calc((100vw - 1024px) * 0.0390625), 10px);
+
+  /* Type scale — DERIVED from deck pt @96dpi. Preferred term = deck_px/12.8 vw so
+     it reaches the deck px exactly at a 1280px viewport (1vw = 12.8px there) and
+     scales DOWN below that (RESPONSIVE-DERIVED); capped at the deck px above. */
+  --fs-nav:        clamp(1.05rem, 2.40vw, 1.917rem);  /* 23pt   -> 30.7px @1280 */
+  --fs-eyebrow:    clamp(0.80rem, 1.667vw, 1.333rem); /* 16pt   -> 21.3px */
+  --fs-lead:       clamp(1.10rem, 2.083vw, 1.667rem); /* 20pt   -> 26.7px */
+  --fs-btn:        clamp(1.05rem, 2.083vw, 1.667rem); /* 20pt   -> 26.7px */
+  --fs-feat-title: clamp(0.95rem, 1.667vw, 1.333rem); /* 16pt   -> 21.3px */
+  --fs-feat-desc:  clamp(0.82rem, 1.198vw, 0.958rem); /* 11.5pt -> 15.3px */
+  --fs-h2:         clamp(1.55rem, 2.917vw, 2.333rem); /* 28pt   -> 37.3px */
+
+  --tracking-eyebrow: 0.1875rem;   /* 3pt = 3px @96dpi -> 0.1875rem (deck spc) */
+
+  /* Radii — DERIVED proportional (0.16667 x min side) -> component tokens */
+  --radius-button: 11px;   /* button 219x67 -> 0.16667*67 */
+  --radius-bar: 20px;      /* feature bar 1212x120 -> 0.16667*120 */
+  --radius-card: 20px;     /* default card token (per-section refined later) */
+
+  --max-width: var(--content-width);   /* back-compat alias for un-reconciled sections */
+  --radius: var(--radius-card);        /* back-compat alias */
+}
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
+  /* Respect the user's browser font-size / zoom setting completely.
+     All typography below is sized in rem so pinch-zoom and
+     browser text-zoom scale everything together, correctly. */
+  font-size: 100%;
+  scroll-behavior: smooth;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background: #FDF8F2;
-  font-family: "Inter", Helvetica, Arial, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-.website,
-.website section {
-  width: 100%;
-  margin: 0;
-  padding: 0;
+img { max-width: 100%; display: block; }
+
+a { color: inherit; }
+
+.section-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 6vw;
 }
 
-.website img {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 0;
-  padding: 0;
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--navy);
+  display: inline-block;
+  padding: 0.35em 0.9em;
+  border-radius: 999px;
+  font-size: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+  margin: 0 0 1rem;
 }
 
-.image-section {
+.eyebrow-center { display: block; width: fit-content; margin-left: auto; margin-right: auto; }
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--navy);
+  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.4rem);
+  line-height: 1.2;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.section-subtitle {
+  text-align: center;
+  max-width: 720px;
+  margin: -0.8rem auto 2.5rem;
+  color: #555;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.15rem);
+  line-height: 1.6;
+}
+
+/* ---------- Header / Navigation ---------- */
+.site-header {
   position: relative;
+  z-index: 100;
+  background: transparent;
+  border-bottom: 0;
 }
 
-.hotspot {
-  position: absolute;
-  display: block;
-  z-index: 10;
+/* Slide 1 oracle: nav is LEFT-aligned within the content band (x49–900),
+   Carlito ~23pt, gold dot separators. Reproduced with flow, not coordinates. */
+.header-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  margin-inline: auto;
+  translate: var(--band-shift) 0;   /* reach the oracle band at 1280 */
+  padding: 1rem 0 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.7rem, 0.4rem + 1.1vw, 1.9rem);
+  flex-wrap: wrap;
+}
+
+.primary-nav a {
+  text-decoration: none;
+  font-family: var(--font-body);   /* Carlito (Aptos) */
+  font-weight: 400;
+  color: var(--navy);
+  font-size: var(--fs-nav);
+  line-height: 1.1;
+  padding: 0.3rem 0.1rem;
+}
+.primary-nav a:hover { color: var(--gold-dark); }
+.nav-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
   cursor: pointer;
 }
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  width: 20px;
+  margin: 0 auto;
+  background: var(--navy);
+}
 
-.home-link     { left: 3.4%;  top: 5.3%; width: 7%;  height: 6%; }
-.about-link    { left: 13.2%; top: 5.3%; width: 7%;  height: 6%; }
-.how-link      { left: 22.5%; top: 5.3%; width: 14%; height: 6%; }
-.services-link { left: 39%;   top: 5.3%; width: 10%; height: 6%; }
-.faq-link      { left: 51%;   top: 5.3%; width: 8%;  height: 6%; }
-.contact-link  { left: 60%;   top: 5.3%; width: 11%; height: 6%; }
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background: var(--navy); color: var(--gold); }
+.btn-primary:hover { background: #14203f; }
+.btn-ghost { border-color: var(--navy); color: var(--navy); }
+.btn-ghost:hover { background: var(--navy); color: var(--gold); }
+.btn-large { font-size: 1.1rem; padding: 1rem 2.4rem; margin-bottom: 2rem; }
 
-.get-in-touch-link {
-  left: 3.4%;
-  top: 59%;
-  width: 17.5%;
-  height: 10%;
-}.website {
-  width: 70%;
+/* ---------- Hero (reconciled to Slide 1 oracle: LEFT-aligned composition) ---------- */
+.hero {
+  background: linear-gradient(180deg, rgba(243, 233, 218, 0.45) 0%, rgba(253, 248, 242, 0.82) 100%), url('images/image1.png') center top / cover no-repeat;
+  padding: clamp(1.2rem, 2.4vw, 2rem) 0 clamp(2.5rem, 5vw, 4.5rem);
+}
+.hero-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  margin-inline: auto;
+  translate: var(--band-shift) 0;   /* reach the oracle band at 1280 */
+  padding: 0;
+  text-align: left;                 /* DERIVED: deck hero is left-aligned */
+}
+/* Eyebrow: deck id13 is navy tracked uppercase text with a short gold rule
+   (id12) above it — NOT a pill. Overrides the shared .eyebrow pill. */
+.hero-eyebrow {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  display: block;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  margin: 0.4rem 0 0.6rem;
+}
+.hero-eyebrow::before {
+  content: "";
+  display: block;
+  width: 46px;                      /* DERIVED: gold rule id12 = 46px */
+  height: 3px;
+  background: var(--gold);
+  margin: 0 0 0.9rem;
+}
+.hero-logo {
+  width: clamp(260px, 56vw, 708px); /* DERIVED: deck logo box 708px (~55% of 1280) */
+  height: auto;
+  /* DERIVED: deck logo box left = 34px, i.e. 10px left of the 44px text band —
+     outdent by the band shift so the box matches the oracle (relaxes below 1024). */
+  margin: 0.2rem 0 1.1rem calc(-1 * var(--band-shift));
+  max-width: 100%;
+}
+.hero-lead {
+  font-family: var(--font-display); /* deck id16 = Montserrat SemiBold 20pt navy */
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--fs-lead);
+  line-height: 1.3;
+  max-width: 43rem;                 /* DERIVED: deck box ~688px */
+  margin: 0 0 1.6rem;
+}
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: clamp(2rem, 4vw, 3.2rem);
+}
+.hero .btn-primary {                /* deck button id70: 219x67px, radius 11, MontSB 600 */
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  font-size: var(--fs-btn);
+  line-height: 1;
+  padding: 1.15rem 1.45rem;         /* DERIVED to reproduce ~219x67px @1280 */
+}
+
+/* Feature bar: cream rounded bar, 4 columns, each [navy icon circle | text],
+   gold vertical dividers between (deck id21 bar + circles + text). */
+.hero-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.4rem 0;
+  background: var(--cream);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-bar);
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 12px 30px rgba(30, 44, 85, 0.1);
+}
+.hero-feature {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 0.9rem;
+  padding: 0.2rem 1.3rem;
+}
+.hero-feature-icon {
+  flex: none;
+  /* DERIVED: deck icon circle = 75px @1280 (75/12.8 = 5.86vw), scales down below */
+  width: clamp(3.25rem, 5.86vw, 4.6875rem);
+  height: clamp(3.25rem, 5.86vw, 4.6875rem);
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* DERIVED: deck icon artwork ~55px inside the 75px circle */
+.hero-feature-icon img { width: clamp(2.4rem, 4.3vw, 3.4375rem); height: auto; }
+.hero-feature h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--fs-feat-title);
+  margin: 0 0 0.15rem;
+}
+.hero-feature p {
+  font-family: var(--font-body);   /* Carlito (Aptos) */
+  font-size: var(--fs-feat-desc);
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.35;
+}
+/* RESPONSIVE-DERIVED: 4-across only when wide enough (deck shows 4 across at
+   full width); 2-up on mid widths; stacked on narrow. */
+@media (min-width: 600px) {
+  .hero-features { grid-template-columns: repeat(2, 1fr); gap: 1.2rem 0; }
+  .hero-feature:nth-child(odd) { border-left: none; }
+  .hero-feature:nth-child(even) { border-left: 1px solid var(--gold); }
+}
+@media (min-width: 1000px) {
+  .hero-features { grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .hero-feature { border-left: 1px solid var(--gold); }
+  .hero-feature:first-child { border-left: none; }
+}
+
+/* ---------- Statement / Decision ---------- */
+/* ---------- Statement / Decision (reconciled to Slide 2 oracle) ----------
+   Deck: light warm photo bg (NOT navy), centred navy 2-line headline, gold
+   connector rule behind 3 CREAM cards (283x330, radius 47, gold 1.2pt border)
+   with navy number circles (65px, gold border+number) straddling the card top;
+   card title = uppercase Montserrat SemiBold gold; body = Carlito navy. */
+.statement {
+  /* light wash for legibility (deck relies on the photo's light tone) = RESPONSIVE-DERIVED */
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.35), rgba(253, 248, 242, 0.55)), url('images/image7.png') center / cover no-repeat;
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+}
+.statement-inner {
+  width: min(100% - 2 * var(--edge), 1040px);   /* card group 1000px + breathing room */
+  margin-inline: auto;
+  text-align: center;
+}
+/* Reusable two-line section headline primitive — RECURS on Slides 2 & 3:
+   line 1 Montserrat SemiBold 25pt + line 2 Montserrat ExtraBold 28pt, navy,
+   centred (deck ids 5 / 177). Promoted from a Slide-2-local rule. */
+.section-headline {
+  margin: 0 0 2.4rem;
+  color: var(--navy);
+  font-family: var(--font-display);
+  line-height: 1.12;
+  text-align: center;
+}
+.section-headline .sh-1 {           /* smaller line — SemiBold 25pt */
+  display: block;
+  font-weight: 600;
+  font-size: clamp(1.4rem, 2.604vw, 2.083rem);   /* 25pt -> 33.3px @1280 */
+}
+.section-headline .sh-2 {           /* larger line — ExtraBold 28pt */
+  display: block;
+  font-weight: 800;
+  font-size: var(--fs-h2);          /* 28pt -> 37.3px */
+}
+.decision-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 5.86vw, 75px);   /* deck gap 75px @1280 */
+  max-width: 1000px;                /* 3x283 + 2x75 */
+  margin-inline: auto;
+  text-align: left;
+  position: relative;
+}
+.decision-steps::before {           /* gold connector rule behind the cards (deck id71) */
+  content: "";
+  position: absolute;
+  top: 46%;
+  left: 4%;
+  right: 4%;
+  height: 6px;
+  background: var(--gold);
+  z-index: 0;
+}
+.decision-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;                /* room for the straddling number circle */
+}
+.decision-step-card {
+  background: var(--cream);          /* deck: solid cream card */
+  border: 1.2px solid var(--gold);
+  border-radius: 47px;               /* DERIVED: 0.16667 x min(283,330) */
+  padding: 2.6rem 1.4rem 1.6rem;
+  width: 100%;
+  box-shadow: 0 10px 26px rgba(30, 44, 85, 0.10);
+}
+.decision-num {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(3rem, 5.08vw, 4.0625rem);   /* deck circle 65px @1280 */
+  height: clamp(3rem, 5.08vw, 4.0625rem);
+  border-radius: 50%;
+  background: var(--navy);
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-feat-title);
+}
+.decision-step-card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--gold);                /* deck title colour #E1CBA8 */
+  font-size: var(--fs-lead);         /* 20pt -> 26.7px */
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+.decision-step-card p {
+  font-family: var(--font-body);     /* Carlito (Aptos) */
+  color: var(--navy);
+  font-size: var(--fs-lead);         /* 20pt -> 26.7px */
+  line-height: 1.3;
+  margin: 0;
+  text-align: center;
+}
+@media (max-width: 720px) {
+  .decision-steps { grid-template-columns: 1fr; max-width: 380px; }
+  .decision-steps::before { display: none; }
+}
+
+/* ---------- How It Works (Journey) ---------- */
+.how-it-works, .research-process, .services, .about {
+  padding: clamp(3rem, 6vw, 5rem) 0;
+}
+.how-it-works {
+  /* light wash so the warm photo shows through (deck bg is the photo) */
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.55), rgba(253, 248, 242, 0.6)), url('images/image8.png') center / cover no-repeat;
+}
+.services {
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.55), rgba(253, 248, 242, 0.62)), url('images/image18.png') center / cover no-repeat;
+}
+.about {
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.58), rgba(253, 248, 242, 0.64)), url('images/image23.png') center / cover no-repeat;
+}
+
+/* Scoped to #how-it-works: use the full 1216 content band (deck cards span
+   34-1250 = a centred 1216 container, so no band-shift needed here). */
+.how-it-works .section-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+/* 7-across at >=~1240px (deck), fluid fewer columns below (RESPONSIVE-DERIVED). */
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 11px;                         /* DERIVED: ~11px between 164px cards */
+  margin-bottom: 2.2rem;
+  padding-top: 2.2rem;               /* room for straddling circles */
+}
+.journey-step {
+  position: relative;
+  background: var(--cream);
+  border: 2.25px solid var(--gold);  /* deck line 2.25pt */
+  border-radius: 27px;               /* DERIVED: 0.16667 x min(164,326) */
+  padding: 2.6rem 0.9rem 1.4rem;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(30, 44, 85, 0.07);
+}
+.journey-icon {                      /* navy circle straddling the card top */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(3rem, 5.39vw, 4.3125rem);   /* deck circle 69px @1280 */
+  height: clamp(3rem, 5.39vw, 4.3125rem);
+  border-radius: 50%;
+  background: var(--navy);
+  border: 2.25px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* deck OPTICAL icon sizes inside the 69px circle (D1: individual dims preserved) */
+.journey-icon img { width: 55%; height: auto; object-fit: contain; }
+.journey-step:nth-child(1) .journey-icon img { width: 57%; }   /* image15 39px */
+.journey-step:nth-child(2) .journey-icon img { width: 75%; }   /* image13 52px */
+.journey-step:nth-child(3) .journey-icon img { width: 49%; }   /* image9  34px */
+.journey-step:nth-child(4) .journey-icon img { width: 58%; }   /* image11 40px */
+.journey-step:nth-child(5) .journey-icon img { width: 54%; }   /* image12 37px */
+.journey-step:nth-child(6) .journey-icon img { width: 58%; }   /* image14 40px */
+.journey-step:nth-child(7) .journey-icon img { width: 49%; }   /* image10 34px */
+.journey-num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--gold-dark);           /* deck number colour #C7A36F */
+  font-size: var(--fs-feat-title);   /* 16pt -> 21.3px */
+  margin-bottom: 0.3rem;
+}
+.journey-step h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--fs-feat-title);   /* 16pt -> 21.3px */
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.12;
+  margin: 0 0 0.5rem;
+}
+.journey-step p {
+  font-family: var(--font-body);     /* Carlito (Aptos) */
+  font-size: 1rem;                   /* deck body ~16px */
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.3;
+}
+.journey-note {                      /* deck: cream box, gold border, italic navy */
+  background: var(--cream);
+  border: 2.25px solid var(--gold);
+  color: var(--navy);
+  border-radius: 16px;
+  padding: 1.1rem 1.6rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1rem, 1.875vw, 1.5rem);   /* 18pt -> 24px @1280 */
+  line-height: 1.3;
+  text-align: center;
+  width: min(100%, 1136px);          /* DERIVED: deck note box 1136px */
   margin: 0 auto;
 }
-
-/* Contact page clickable areas */
-
-.contact-email {
-  left: 12%;
-  top: 36%;
-  width: 25%;
-  height: 11%;
+.journey-note-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 0.5rem 0.2rem 0;
+  font-style: normal;
 }
 
-.contact-whatsapp {
-  left: 12%;
-  top: 50%;
-  width: 22%;
-  height: 9%;
+/* ---------- Research Process ---------- */
+/* ---------- Research Process (reconciled to Slide 4 oracle: 2x5 grid) ----------
+   Deck: light photo bg; title-then-subtitle heading (ExtraBold 28pt + SemiBold
+   25pt, navy — NOTE reverse of .section-headline, so NOT that primitive); 10
+   white cards (212x245, radius 35, gold 2.25pt border) in a 2x5 grid with navy
+   65px number circles (gold border + gold number) straddling the card top; card
+   title = Carlito bold uppercase navy, body = Carlito navy 16pt. No connectors. */
+.research-process {
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.55), rgba(253, 248, 242, 0.62)), url('images/image17.png') center / cover no-repeat;
+}
+.research-process .section-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+/* Reusable title-then-subtitle heading primitive — RECURS on Slides 4 & 5:
+   ExtraBold 28pt title, then SemiBold navy subtitle (size via --sub-fs; deck
+   S4=25pt, S5=20pt), navy, centred. Distinct from .section-headline (S2/S3,
+   which is subtitle-then-title, both prominent). */
+.section-heading {
+  text-align: center;
+  margin: 0 0 2.6rem;
+  --sub-fs: clamp(1.4rem, 2.604vw, 2.083rem);   /* default 25pt -> 33.3px */
+}
+.section-heading > h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--navy);
+  font-size: var(--fs-h2);           /* 28pt -> 37.3px */
+  line-height: 1.12;
+  text-align: inherit;
+  margin: 0 0 0.5rem;
+}
+.section-heading.left { text-align: left; }   /* FAQ (S7) heading is left-aligned */
+.section-heading.left > p { margin-inline: 0; }
+.section-heading > p {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--sub-fs);
+  line-height: 1.2;
+  max-width: 950px;
+  margin: 0 auto;
+}
+.section-heading.sub-20 { --sub-fs: clamp(1.1rem, 2.083vw, 1.667rem); }  /* 20pt -> 26.7px */
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2.8rem 24px;                  /* DERIVED col gap 24px; row gap fits circle */
+  width: min(100%, 1156px);          /* DERIVED: 5x212 + 4x24 */
+  margin-inline: auto;
+  translate: var(--band-shift) 0;    /* group is ~10px right of centre @1280 */
+  padding-top: 2.4rem;
+}
+.process-card {
+  position: relative;
+  background: #fff;                  /* KNOWN: deck fill scheme bg1 = solid white, no alpha/effects */
+  border: 2.25px solid var(--gold);
+  border-radius: 35px;               /* DERIVED: 0.16667 x 212 */
+  padding: 2.9rem 1.1rem 1.4rem;
+  text-align: center;
+}
+.process-num {                       /* navy circle straddling card top */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(3rem, 5.08vw, 4.0625rem);   /* deck circle 65px @1280 */
+  height: clamp(3rem, 5.08vw, 4.0625rem);
+  border-radius: 50%;
+  background: var(--navy);
+  border: 2.25px solid var(--gold);
+  color: var(--gold);                /* deck number colour #E1CBA8 */
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-feat-title);   /* 16pt -> 21.3px */
+}
+.process-card h3 {                   /* deck title: Aptos bold uppercase navy */
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--navy);
+  font-size: var(--fs-feat-title);   /* 16pt -> 21.3px */
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  margin: 0 0 0.4rem;
+}
+.process-card p {
+  font-family: var(--font-body);     /* Carlito (Aptos) */
+  font-size: var(--fs-feat-title);   /* deck body 16pt -> 21.3px */
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.25;
 }
 
-.contact-instagram {
-  left: 12%;
-  top: 84%;
-  width: 25%;
-  height: 10%;
+/* ---------- Services / Pricing ---------- */
+/* ---------- Services / Pricing (reconciled to Slide 5 oracle) ----------
+   Deck: light photo bg; 3 IDENTICAL white cards (378x357, radius 59, gold 2.25pt
+   border — no "featured"/badge) with navy 72px icon circles straddling the top;
+   title MontالسSemiBold 20pt navy, price Carlito gold-dark 20pt, description
+   Carlito navy 16pt, hairline divider, 3 gold check-bullets Carlito 12pt navy.
+   Icon artwork sizes are the deck's OPTICAL sizes (48/53/54px), preserved. */
+.services .section-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 26px;                         /* DERIVED col pitch 404 - card 378 */
+  align-items: stretch;
+  width: min(100%, 1186px);          /* DERIVED: 3x378 + 2x26 */
+  margin-inline: auto;
+  translate: var(--band-shift) 0;
+  padding-top: 2.6rem;
+}
+.price-icon-circle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(3.25rem, 5.63vw, 4.5rem);   /* deck circle 72px @1280 */
+  height: clamp(3.25rem, 5.63vw, 4.5rem);
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.price-icon { display: block; height: auto; }
+/* deck OPTICAL icon sizes inside the 72px circle (D1 preserved) */
+.price-card:nth-child(1) .price-icon { width: 67%; }   /* image20 48px */
+.price-card:nth-child(2) .price-icon { width: 74%; }   /* image21 53px */
+.price-card:nth-child(3) .price-icon { width: 75%; }   /* image22 54px */
+.price-card {
+  position: relative;
+  background: #fff;
+  border: 2.25px solid var(--gold);
+  border-radius: 59px;               /* DERIVED: 0.16667 x 357 */
+  padding: 3.2rem 1.5rem 2rem;
+  text-align: center;
+}
+.price-card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--fs-lead);         /* 20pt -> 26.7px */
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.3rem;
+}
+.price-card .price {
+  font-family: var(--font-body);     /* Carlito (Aptos) */
+  font-weight: 700;
+  color: var(--gold-dark);           /* deck price colour #C7A36F */
+  font-size: var(--fs-lead);         /* 20pt -> 26.7px */
+  margin: 0 0 0.8rem;
+}
+.price-card .price-desc {
+  font-family: var(--font-body);
+  color: var(--navy);
+  font-size: var(--fs-feat-title);   /* 16pt -> 21.3px */
+  line-height: 1.3;
+  margin: 0 0 1.1rem;
+}
+.price-bullets {
+  list-style: none;
+  margin: 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--divider);   /* deck hairline #C8C8C8 */
+  text-align: left;
+  display: grid;
+  gap: 0.7rem;
+}
+.price-bullets li {
+  font-family: var(--font-body);
+  font-size: 1rem;                   /* deck bullets 12pt ~ 16px */
+  color: var(--navy);
+  line-height: 1.3;
+  padding-left: 1.8rem;
+  position: relative;
+}
+.price-bullets li::before {          /* gold check disc (deck ellipse + image19 tick) */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.price-bullets li::after {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 0.42rem;
+  width: 0.62rem;
+  height: 0.62rem;
+  background: var(--navy);
+  -webkit-mask: url('images/image19.svg') center / contain no-repeat;
+  mask: url('images/image19.svg') center / contain no-repeat;
+}
+.pricing-note {                      /* deck id30: cream box, italic navy */
+  text-align: center;
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--navy);
+  background: var(--cream);
+  border-radius: 12px;
+  font-size: var(--fs-feat-title);   /* ~16pt */
+  padding: 0.9rem 1.4rem;
+  width: min(100%, 970px);           /* DERIVED: deck note box 970px */
+  margin: 2.2rem auto 0;
 }
 
-.contact-facebook {
-  left: 40%;
-  top: 84%;
-  width: 22%;
-  height: 10%;
+/* ---------- About ---------- */
+/* ---------- About / Meet Jodi (reconciled to Slide 6 oracle) ----------
+   Deck: light bg; full-width heading "MEET JODI" (navy) + heart + role (gold-dark)
+   ExtraBold 24pt, then lead SemiBold 20pt navy; 2 columns — rectangular portrait
+   left, JUSTIFIED body right (Carlito navy 16px); cream quote box (gold border,
+   Montserrat SemiBold navy) at the bottom. */
+.about .section-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+.about-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);   /* 24pt -> 32px @1280 */
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.6rem;
+}
+.about-title .at-name { color: var(--navy); }
+.about-title .at-role { color: var(--gold-dark); }
+.about-title .at-heart { width: 1.4rem; height: 1.4rem; }
+.about-lead {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: var(--fs-lead);          /* 20pt -> 26.7px */
+  line-height: 1.25;
+  margin: 0 0 1.6rem;
+  max-width: 60rem;
+}
+.about-cols {
+  display: grid;
+  grid-template-columns: minmax(300px, 430px) 1fr;   /* deck portrait ~457px */
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  align-items: start;
+  margin-bottom: 2rem;
+}
+.about-photo {
+  aspect-ratio: 457 / 461;            /* deck portrait proportions */
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+.about-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.about-copy p {
+  font-family: var(--font-body);      /* Carlito (Aptos) */
+  color: var(--navy);
+  font-size: 1rem;                    /* deck body ~16px */
+  line-height: 1.5;
+  text-align: justify;                /* deck body is justified */
+  margin: 0 0 0.9rem;
+}
+.about-copy p:last-child { margin-bottom: 0; }
+.about-quote-box { margin-top: 0.5rem; }
+.about-quote {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--cream);           /* deck fill #FDF8F2 */
+  border: 2.25px solid var(--gold);
+  border-radius: 16px;
+  padding: 1.3rem 2rem;
+  font-size: var(--fs-feat-title);    /* ~18px */
+  line-height: 1.4;
+  width: min(100%, 970px);            /* DERIVED: deck quote box 970px */
+  margin: 0 auto;
+}
+@media (max-width: 760px) {
+  .about-cols { grid-template-columns: 1fr; }
+  .about-photo { max-width: 360px; margin: 0 auto; width: 100%; }
+  .about-copy p { text-align: left; }   /* justify reads poorly on narrow mobile */
 }
 
-.contact-linkedin {
-  left: 63%;
-  top: 84%;
-  width: 25%;
-  height: 10%;
-}
-
-.contact-get-started {
-  left: 11%;
-  top: 64%;
-  width: 33%;
-  height: 15%;
-}
-
-/* FAQ accordion — final */
+/* ---------- FAQ ---------- */
 #faqs.faq-section {
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 720px;
-  padding: 42px 6% 40px !important;
-  background-color: #FDF8F2 !important;
-  background-image: url('images/faq-bg.png') !important;
-  background-size: cover !important;
-  background-position: center top !important;
-  background-repeat: no-repeat !important;
+  padding: clamp(2.5rem, 5vw, 4rem) 6% clamp(2.5rem, 5vw, 4rem);
+  background-color: var(--cream);
+  background-image: url('images/image26.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
-/* Clean background already has the old FAQ artwork removed. */
-#faqs.faq-section::before {
-  content: none;
-}
-
+/* FAQ reconciled to Slide 7 oracle: PPT is VISUAL authority; existing <details>
+   is INTERACTION authority. Off-white bars (#FFFCF8, thin gold border, radius 9),
+   gold "›" chevron, question Carlito 24pt navy, "+"/"−" toggle. */
 #faqs .faq-inner {
   position: relative;
   z-index: 1;
-  width: 88%;
-  max-width: none;
+  width: min(100%, 1040px);          /* DERIVED: deck FAQ band 1040px */
   margin: 0 auto;
 }
-
-#faqs .faq-inner h2 {
-  margin: 0 0 6px;
-  color: #1E2C55;
-  font-family: "Inter", Helvetica, Arial, sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.15;
-  text-align: left;
-}
-
-#faqs .faq-intro {
-  margin: 0 0 26px;
-  color: #1E2C55;
-  font-family: "Inter", Helvetica, Arial, sans-serif;
-  font-size: 27px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: left;
-}
+#faqs .faq-inner .section-heading { margin: 0 0 1.6rem; }
 
 #faqs details.faq-row {
   display: block;
   width: 100%;
-  margin: 0 0 8px;
+  margin: 0 0 0.6rem;
   padding: 0;
-  background: #FDF8F2;
-  border: 1px solid #E1CBA8;
-  border-radius: 10px;
-  box-shadow: 0 3px 3px rgba(30, 44, 85, 0.18);
-  color: #1E2C55;
+  background: var(--off-white);       /* deck #FFFCF8 */
+  border: 1px solid var(--gold);      /* deck 0.75pt */
+  border-radius: 9px;                 /* DERIVED: 0.16667 x 56 */
+  box-shadow: 0 3px 5px rgba(30, 44, 85, 0.08);
+  color: var(--navy);
 }
-
 #faqs details.faq-row summary {
   position: relative;
   display: block;
-  min-height: 68px;
-  padding: 18px 68px 18px 58px;
-  color: #1E2C55;
-  font-family: "Inter", Helvetica, Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 700;
+  min-height: 3.5rem;                 /* deck row 56px */
+  padding: 0.6rem 3.6rem 0.6rem 3rem;
+  color: var(--navy);
+  font-family: var(--font-body);      /* Carlito (Aptos) */
+  font-size: clamp(1.05rem, 2.5vw, 2rem);   /* 24pt -> 32px @1280 */
+  font-weight: 400;
   line-height: 1.15;
   cursor: pointer;
   list-style: none;
 }
-
 #faqs details.faq-row summary::-webkit-details-marker { display: none; }
 #faqs details.faq-row summary::marker { content: ""; }
-
-#faqs details.faq-row summary::before {
-  content: "›";
+#faqs details.faq-row summary::before {   /* gold chevron (deck "›" 32pt gold) */
+  content: "\203A";
   position: absolute;
-  left: 24px;
+  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #E1CBA8;
-  font-size: 40px;
-  font-weight: 700;
+  color: var(--gold);
+  font-size: clamp(1.6rem, 3.3vw, 2.6rem);
+  line-height: 1;
 }
-
-#faqs details.faq-row summary::after {
+#faqs details.faq-row summary::after {    /* +/- toggle (deck "+" 24pt navy) */
   content: "+";
   position: absolute;
-  right: 26px;
+  right: 1.1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #1E2C55;
-  font-size: 40px;
-  font-weight: 700;
+  color: var(--navy);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400;
 }
-
-#faqs details.faq-row[open] summary::after { content: "−"; }
-
+#faqs details.faq-row[open] summary::after { content: "\2212"; }
 #faqs details.faq-row p {
   margin: 0;
-  padding: 4px 58px 22px;
-  color: #1E2C55;
-  font-family: "Inter", Helvetica, Arial, sans-serif;
-  font-size: 18px;
+  padding: 0.2rem 3rem 1.3rem;
+  color: var(--navy);
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   font-weight: 400;
-  line-height: 1.45;
+  line-height: 1.55;
 }
 
 @media (max-width: 600px) {
-  #faqs.faq-section {
-    min-height: 0;
-    padding: 28px 5% 30px !important;
-  }
-  #faqs .faq-inner { width: 94%; }
-  #faqs .faq-inner h2 { font-size: 28px; }
-  #faqs .faq-intro { font-size: 18px; margin-bottom: 20px; }
-  #faqs details.faq-row summary {
-    min-height: 48px;
-    padding: 13px 48px 13px 38px;
-    font-size: 17px;
-  }
-  #faqs details.faq-row summary::before { left: 14px; }
-  #faqs details.faq-row summary::after { right: 16px; }
-  #faqs details.faq-row p {
-    padding: 0 38px 16px;
-    font-size: 16px;
-  }
+  #faqs details.faq-row summary { padding: 0.8rem 2.6rem 0.8rem 2.1rem; }
+  #faqs details.faq-row summary::before { left: 0.8rem; }
+  #faqs details.faq-row summary::after { right: 0.9rem; }
+  #faqs details.faq-row p { padding: 0 2.1rem 1rem; }
 }
 
-/* Space between website pages */
-.website {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* ---------- Contact ---------- */
+/* ---------- Contact (reconciled to Slide 8 oracle: LEFT-aligned) ----------
+   Deck: light photo bg (photo shows on the right); left-aligned heading; a left
+   column of 3 items (Email / Call-WhatsApp / Let's Get Started) each = icon +
+   label (MontSB 22pt navy) + value (Carlito 20pt navy), no card; cream social
+   bar (gold border) with 3 socials in gold-bordered circles + gold dividers. */
+.contact {
+  background: linear-gradient(180deg, rgba(253, 248, 242, 0.5), rgba(253, 248, 242, 0.58)), url('images/image27.png') center / cover no-repeat;
+  padding: clamp(3rem, 6vw, 5rem) 0;
+}
+.contact .section-inner {
+  width: min(100% - 2 * var(--edge), var(--content-width));
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+.contact-inner { text-align: left; }
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  max-width: 640px;                  /* deck left column ~x39-716 */
+  margin: 0 0 2.4rem;
+}
+.contact-detail {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: var(--navy);
+  text-align: left;
+}
+.contact-detail img { width: 3.2rem; height: 3.2rem; flex: none; }   /* deck icons ~65-83px (see register) */
+.contact-detail span { display: flex; flex-direction: column; gap: 0.1rem; }
+.contact-detail strong {           /* label: MontSB 22pt navy */
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.15rem, 2.3vw, 1.833rem);   /* 22pt -> 29.3px */
+  color: var(--navy);
+}
+.contact-detail span {             /* value: Carlito 20pt navy */
+  font-family: var(--font-body);
+  font-size: var(--fs-lead);         /* 20pt -> 26.7px */
+  color: var(--navy);
+}
+.contact-detail:hover strong { color: var(--gold-dark); }
+
+.contact-social-bar {
+  background: var(--cream);          /* deck id249 #FDF8F2 */
+  border: 2px solid var(--gold);
+  border-radius: 15px;               /* DERIVED: 0.16667 x 90 */
+  padding: 1rem 1.5rem;
+  width: min(100%, 880px);           /* DERIVED: deck social bar 880px */
+}
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+}
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: var(--navy);
+}
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;                    /* deck social circle 68px */
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex: none;
+}
+.social-icon svg { width: 1.5rem; height: 1.5rem; }
+.social-text { display: flex; flex-direction: column; font-family: var(--font-display); font-size: 1rem; text-align: left; }
+.social-text strong { font-weight: 600; font-size: 1.05rem; color: var(--navy); }
+.social-link:hover .social-icon { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+@media (max-width: 640px) {
+  .contact-links { flex-direction: column; align-items: flex-start; }
 }
 
-/* Legal footer preview */
+/* ---------- Legal footer ---------- */
 .legal-footer {
-    margin-top: 120px;
-    background: #1E2C55;
-    padding: 45px 20px;
-    text-align: center;
+  margin-top: 3rem;
+  background: var(--navy);
+  padding: clamp(2rem, 4vw, 2.8rem) 1.25rem;
+  text-align: center;
 }
 
 .legal-footer-inner {
-    max-width: 1200px;
-    margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .legal-title {
-    color: #E1CBA8;
-    font-family: "Montserrat ExtraBold", "Montserrat", sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 22px;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1rem + 0.4vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.4rem;
 }
 
 .legal-links {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px 35px;
-    color: #E1CBA8;
-    font-family: "Montserrat", sans-serif;
-    font-size: 20px;
-    font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem 2.2rem;
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 0.8rem + 0.2vw, 1.05rem);
+  font-weight: 500;
 }
 
 .legal-links a,
 .legal-links a:visited {
-    color: #E1CBA8 !important;
-    text-decoration: none;
-font-family: "Inter", Helvetica, Arial, sans-serif !important;
-    font-weight: 400 !important;
+  color: var(--gold);
+  text-decoration: none;
 }
 
 .legal-links a:hover {
-    color: #FDF8F2 !important;
-    font-weight: 400 !important;
-    text-decoration: underline;
-}
-
-#how-it-works img {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
-}
-
-#research-process {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-}
-
-#research-process img {
-  display: block !important;
-  width: 100% !important;
-  max-width: none !important;
-  height: auto !important;
-  object-fit: contain !important;
-  object-position: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  transform: none !important;
+  color: var(--cream);
+  text-decoration: underline;
 }
 
 .copyright {
-  color: #E1CBA8;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 400 !important;
-  font-style: normal !important;
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
   text-align: center;
-  margin-top: 22px;
+  margin-top: 1.4rem;
+}
+
+/* ---------- Responsive nav ---------- */
+@media (max-width: 860px) {
+  .nav-toggle { display: flex; }
+  .primary-nav {
+    position: absolute;
+    top: calc(100% - 0.3rem);
+    left: 0;
+    right: 0;
+    background: var(--cream);
+    border-bottom: 1px solid var(--gold);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.5rem 6vw 1rem;
+    gap: 0.2rem;
+    display: none;
+  }
+  .primary-nav.open { display: flex; }
+  .primary-nav a { padding: 0.7rem 0; border-bottom: 1px solid var(--cream-dark); }
+  .primary-nav a.nav-cta { text-align: center; margin-top: 0.5rem; }
 }
 
